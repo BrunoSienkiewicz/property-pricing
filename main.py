@@ -1,16 +1,18 @@
-from database import Database
-
+from database import Database, Listing
+from sql_queries import custom_sql_get
+from models import load_data_from_db_to_df, ohe_feature
+import mysql.connector
 
 def main():
-    features = ['Build_year', 'Floor_no', 'Heating', 'MarketType', 
-    'Building_ownership', 'Extras_types', 'Rent', 'Equipment_types',
-    'Construction_status', 'Building_type', 
-    'Building_material', 'Media_types', 'Security_types',
-    'latitude', 'longitude']
-    database = Database("test", features, "warszawa", 1, 2)
-    database.scrape_listings()
-    database.format_listings()
+    # database = Database("localhost", "root", "mysql", "test", "warszawa", 2, 4)
+    # database.scrape_listings()
+    # database.format_listings()
+
+    # database.insert_to_db()
+
+    df = load_data_from_db_to_df(50, 'localhost', 'root', 'mysql')
     pass
+    df.to_csv('data.csv')
 
 if __name__ == "__main__":
     main()
