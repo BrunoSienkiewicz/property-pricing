@@ -1,0 +1,10 @@
+bs4
+selenium
+mysql-connector-python
+pandas
+numpy
+seaborn
+scikit-learn
+matplotlib
+tensorflow
+word2number
