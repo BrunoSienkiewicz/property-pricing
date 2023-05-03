@@ -1,10 +1,11 @@
 from database import Database, Listing
 from sql_queries import custom_sql_get
-from models import load_data_from_db_to_df, ohe_feature, ohe_list_feature, build_model_random_forest
+from models import load_data_from_db_to_df, preprocessing_df, build_model_random_forest, fill_missing_columns
 import mysql.connector
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
+import numpy as np
 
 def main():
     # database = Database("localhost", "root", "mysql", "test", "warszawa", 2, 4)
@@ -13,27 +14,32 @@ def main():
 
     # database.insert_to_db()
 
-    df = load_data_from_db_to_df(1, 'localhost', 'root', 'mysql')
-    pass
-    df.to_csv('prediction.csv')
-    # df = pd.read_csv('data.csv')
-    # df = df.drop(['Unnamed: 0'], axis=1)
-    # df = df.dropna(subset=['Total Price'])
-
-    # features_to_ohe = ['City', 'Region', 'type of estate', 'MarketType', 'Building_type', 'Building_ownership', 'Building_material', 'Construction_status']
-    # df = df.drop(['title', 'Estate_url', 'Date_added'], axis=1)
-    # feature_list_to_ohe = ['Equipment_types', 'Extras_types', 'Media_types', 'Security_types']
-
-    # for feature in features_to_ohe:
-    #     df = ohe_feature(df, feature)
-
-    # for feature in feature_list_to_ohe:
-    #     df = ohe_list_feature(df, feature)
-    
-    # print(df.columns)
-    # model, mse = build_model_random_forest(df, 0.2, df.columns, 'Total Price')
-    # print(mse)
+    # df = load_data_from_db_to_df(1, 'localhost', 'root', 'mysql')
     # pass
+    # df.to_csv('prediction.csv')
+    df = pd.read_csv('data.csv')
+    df = df.drop(['Unnamed: 0'], axis=1)
+    df = df.dropna(subset=['Total Price'])
+
+    features_to_ohe = ['City', 'Region', 'type of estate', 'MarketType', 'Building_type', 'Building_ownership', 'Building_material', 'Construction_status']
+    features_to_drop = ['title', 'Estate_url', 'Date_added']
+    feature_list_to_ohe = ['Equipment_types', 'Extras_types', 'Media_types', 'Security_types']
+
+    predict_df = pd.read_csv('prediction.csv')
+    predict_df = predict_df.drop(['Unnamed: 0'], axis=1)
+
+    predict_df = preprocessing_df(predict_df, features_to_drop, features_to_ohe, feature_list_to_ohe)
+
+    df = preprocessing_df(df, features_to_drop, features_to_ohe, feature_list_to_ohe)
+
+    df, predict_df = fill_missing_columns(df, predict_df)
+    
+    model, mse = build_model_random_forest(df, 0.2, df.columns.values.tolist(), 'Total Price')
+    print(np.sqrt(mse))
+
+    price_pred = model.predict(predict_df)
+    print(price_pred)
+
 
 if __name__ == "__main__":
     main()
