@@ -18,37 +18,37 @@ CREATE TABLE estate_info(
   total_price INT NOT NULL,
   price_per_square_meter INT NOT NULL,
   area INT NOT NULL,
-  room_number INT NOT NULL,
-  build_year INT,
   market_type VARCHAR(255),
-  rent INT,
-  building_type VARCHAR(255),
-  floor_no INT,
-  heating VARCHAR(255),
-  building_ownership VARCHAR(255),
-  construction_status VARCHAR(255),
-  building_material VARCHAR(255),
   estate_url VARCHAR(255),
   date_added DATE NOT NULL
 );
 
 -- Create City table
 CREATE TABLE City(
-  city_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  city_id INT SERIAL PRIMARY KEY,
   city_name VARCHAR(255) NOT NULL UNIQUE
 );
 
 -- Create Region table
 CREATE TABLE Region(
-  region_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  region_id INT SERIAL PRIMARY KEY,
   region_name VARCHAR(255) NOT NULL UNIQUE,
   city_id INT NOT NULL,
   FOREIGN KEY (city_id) REFERENCES City(city_id)
 );
 
+-- Create features table
+CREATE TABLE features(
+  feature_id INT SERIAL PRIMARY KEY,
+  feature_name VARCHAR(255) NOT NULL,
+  feature_value VARCHAR(255) NOT NULL,
+  estate_id INT NOT NULL,
+  FOREIGN KEY (estate_id) REFERENCES estate_info(estate_id)
+);
+
 -- Create extras_types table
 CREATE TABLE extras_types(
-  extras_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  extras_id INT SERIAL PRIMARY KEY,
   extras_name VARCHAR(255) NOT NULL UNIQUE
 );
 
