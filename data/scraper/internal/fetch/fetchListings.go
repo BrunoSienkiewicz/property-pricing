@@ -3,6 +3,7 @@ package fetch
 import (
 	"fmt"
 	// "log"
+	"regexp"
 	"strconv"
 )
 
@@ -12,27 +13,43 @@ const (
 		"AppleWebKit/537.36 (KHTML, like Gecko) Chrome/44.0.2403.157 Safari/537.36"
 )
 
+type PageResult struct {
+	listings []string
+}
+
 type ListingFetcher struct {
-	Fetcher
+	Fetcher[PageResult]
 }
 
 func (f *ListingFetcher) processResults() {
-	for url, body := range f.results {
-		// process body
-		_ = url
-		_ = body
+	for url, body := range f.urls_body {
+		pattern := `<a\s+href="(/pl/oferta/[^"]+)">`
+		re := regexp.MustCompile(pattern)
+		matches := re.FindAllStringSubmatch(body, -1)
+
+		pageResult := PageResult{}
+		for _, match := range matches {
+			pageResult.listings = append(pageResult.listings, match[1])
+		}
+
+		if len(pageResult.listings) > 0 {
+			f.results[url] = pageResult
+		} else {
+			f.chFailed <- url
+		}
 	}
 }
 
-func FetchListings(city string, pages int) map[string]string {
+func FetchListings(city string, pages int) map[string]PageResult {
 	var pagesUrls []string
 	for i := 1; i <= pages; i++ {
 		url := pageUrl + city + "/?page=" + strconv.Itoa(i)
 		pagesUrls = append(pagesUrls, url)
 	}
 
-	listingFetcher := ListingFetcher{Fetcher: *NewFetcher(userAgent, pagesUrls)}
+	listingFetcher := ListingFetcher{Fetcher: *NewFetcher[PageResult](userAgent, pagesUrls)}
 	listingFetcher.Fetch()
+	listingFetcher.processResults()
 
 	results := listingFetcher.GetResults()
 	failedUrls := listingFetcher.GetFailedUrls()
