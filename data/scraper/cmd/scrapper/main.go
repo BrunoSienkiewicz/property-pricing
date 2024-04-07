@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"internal/fetch"
+	fetch "github.com/BrunoSienkiewicz/Property_pricing/data/scraper/internal/fetch"
 )
 
 const (
@@ -13,13 +13,18 @@ const (
 )
 
 func main() {
-	results := fetch.FetchListings("warszawa", 3)
-	for url, res := range results {
+	pagesResults := fetch.FetchListings("warszawa", 1)
+
+	listingUrls := make([]string, 0)
+	for url, res := range pagesResults {
 		fmt.Println("URL:", url)
 		fmt.Println(res)
-		// for _, listing := range res.Listings {
-		// 	fmt.Println(propertyUrl+listing, "\n")
-		// }
-		fmt.Println()
+		for _, listing := range res.Listings {
+			fmt.Println("Listing:", listing)
+			listingUrls = append(listingUrls, propertyUrl+listing)
+		}
 	}
+
+	properties := fetch.FetchData(listingUrls)
+	fmt.Println(properties)
 }

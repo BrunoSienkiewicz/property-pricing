@@ -5,6 +5,8 @@ import (
 	// "log"
 	"regexp"
 	"strconv"
+
+	types "github.com/BrunoSienkiewicz/Property_pricing/data/scraper/internal/types"
 )
 
 const (
@@ -13,12 +15,8 @@ const (
 		"AppleWebKit/537.36 (KHTML, like Gecko) Chrome/44.0.2403.157 Safari/537.36"
 )
 
-type PageResult struct {
-	Listings []string
-}
-
 type ListingFetcher struct {
-	Fetcher[PageResult]
+	Fetcher[types.PageResult]
 }
 
 func (f *ListingFetcher) processResults() {
@@ -27,7 +25,7 @@ func (f *ListingFetcher) processResults() {
 		re := regexp.MustCompile(pattern)
 		matches := re.FindAllStringSubmatch(body, -1)
 
-		pageResult := PageResult{}
+		pageResult := types.PageResult{}
 		for _, match := range matches {
 			fmt.Println("match:", match)
 			pageResult.Listings = append(pageResult.Listings, match[1])
@@ -41,14 +39,14 @@ func (f *ListingFetcher) processResults() {
 	}
 }
 
-func FetchListings(city string, pages int) map[string]PageResult {
+func FetchListings(city string, pages int) map[string]types.PageResult {
 	var pagesUrls []string
 	for i := 1; i <= pages; i++ {
 		url := pageUrl + city + "/?page=" + strconv.Itoa(i)
 		pagesUrls = append(pagesUrls, url)
 	}
 
-	listingFetcher := ListingFetcher{Fetcher: *NewFetcher[PageResult](userAgent, pagesUrls)}
+	listingFetcher := ListingFetcher{Fetcher: *NewFetcher[types.PageResult](userAgent, pagesUrls)}
 	listingFetcher.Fetch()
 	listingFetcher.processResults()
 
