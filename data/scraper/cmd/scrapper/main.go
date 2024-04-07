@@ -16,9 +16,10 @@ func main() {
 	results := fetch.FetchListings("warszawa", 3)
 	for url, res := range results {
 		fmt.Println("URL:", url)
-		for _, listing := range res.Listings {
-			fmt.Println(listing)
-		}
+		fmt.Println(res)
+		// for _, listing := range res.Listings {
+		// 	fmt.Println(propertyUrl+listing, "\n")
+		// }
 		fmt.Println()
 	}
 }

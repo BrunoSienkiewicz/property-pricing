@@ -14,7 +14,7 @@ const (
 )
 
 type PageResult struct {
-	listings []string
+	Listings []string
 }
 
 type ListingFetcher struct {
@@ -29,10 +29,11 @@ func (f *ListingFetcher) processResults() {
 
 		pageResult := PageResult{}
 		for _, match := range matches {
-			pageResult.listings = append(pageResult.listings, match[1])
+			fmt.Println("match:", match)
+			pageResult.Listings = append(pageResult.Listings, match[1])
 		}
 
-		if len(pageResult.listings) > 0 {
+		if len(pageResult.Listings) > 0 {
 			f.results[url] = pageResult
 		} else {
 			f.chFailed <- url
