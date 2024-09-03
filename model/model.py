@@ -7,13 +7,12 @@ class CustomNet(nn.Module):
         self,
         input_size,
         hidden_size,
-        num_layers,
+        hidden_layers,
         out_size,
-        hidden_layers=1,
         dropout=0.1,
     ):
         super(CustomNet, self).__init__()
-        self.num_layers = num_layers
+        self.hidden_layers = hidden_layers
         self.hidden_size = hidden_size
 
         self.fc_in = nn.Linear(input_size, hidden_size)
@@ -34,7 +33,7 @@ class CustomNet(nn.Module):
 
     def forward(self, x):
         x = self.LeakyReLU(self.fc_in(x))
-        for i in range(self.num_layers):
+        for i in range(self.hidden_layers):
             x = self.LeakyReLU(self.layers[i](x))
         x = self.fc_out(x)
         return x

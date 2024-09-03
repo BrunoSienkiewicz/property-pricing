@@ -14,7 +14,7 @@ def train_net(net, train_data_loader, eval_data_loader, optimizer, criterion, ev
     for epoch in range(epochs):
         running_loss = 0.0
         for x, y in tqdm(train_data_loader):
-            x, y = x.to(device).unsqueeze(2), y.to(device)
+            x, y = x.to(device), y.to(device)
             optimizer.zero_grad()
             preds, _ = net(x)
             loss = criterion(preds, y)

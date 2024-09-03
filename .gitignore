@@ -1,3 +1,15 @@
-.venv
+# Python
+.venv/
+__pycache__/
 
+# Terraform
+.terraform/
+terraform.tfstate
+.terraform.lock.hcl
+.tfvars
+
+# Go
+bin/
+
+# Docker
 postgres_data/
