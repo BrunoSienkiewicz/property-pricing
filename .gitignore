@@ -1,8 +1,9 @@
 # Python
 .venv/
 __pycache__/
-.pth
-.csv
+artifacts/
+*.pth
+*.csv
 
 # Terraform
 .terraform/
@@ -13,6 +14,7 @@ terraform.tfstate
 
 # Go
 bin/
+*.zip
 
 # Docker
 postgres_data/
