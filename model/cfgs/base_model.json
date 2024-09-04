@@ -1,0 +1,30 @@
+{
+  "model_name": "base_model",
+  "model_version": "1.0",
+  "model_description": "This is a base model for testing purposes",
+  "model_metadata": {
+    "features": [
+      "property_info:city",
+      "property_info:region",
+      "property_info:floor",
+      "property_info:area",
+      "property_info:year_built",
+      "property_info:rooms",
+      "property_info:total_price"
+    ],
+    "target": "total_price",
+    "ohe_features": ["city", "region"],
+    "categorical_features": [],
+    "numerical_features": [
+      "floor",
+      "area",
+      "year_built",
+      "rooms"
+    ],
+  }
+  "query_path": "get_property_info.sql",
+  "query_params": {
+    "start_date": "2021-01-30",
+    "end_date": "2021-02-02"
+  }
+}

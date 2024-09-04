@@ -1,14 +1,16 @@
 import torch
 import torch.nn as nn
 
+from utils import load_query
+
 
 class CustomNet(nn.Module):
     def __init__(
         self,
-        input_size,
-        hidden_size,
-        hidden_layers,
-        out_size,
+        input_size: int,
+        hidden_size: int,
+        hidden_layers: int,
+        out_size: int,
         dropout=0.1,
     ):
         super(CustomNet, self).__init__()

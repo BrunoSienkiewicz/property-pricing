@@ -1,10 +1,13 @@
 # Python
 .venv/
 __pycache__/
+.pth
+.csv
 
 # Terraform
 .terraform/
 terraform.tfstate
+.terraform.tfstate.backup
 .terraform.lock.hcl
 .tfvars
 

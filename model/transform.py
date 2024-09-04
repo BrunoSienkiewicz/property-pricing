@@ -1,23 +1,51 @@
-import torch
-import torch.utils.data
-import torch.nn.functional as F
-import pandas as pd
 import numpy as np
-
+import pandas as pd
+import torch.nn.functional as F
 from imblearn.over_sampling import SMOTE
+from sklearn.preprocessing import OneHotEncoder, OrdinalEncoder, StandardScaler
 
 
-def get_dummies(data: pd.DataFrame, columns: list[str]) -> pd.DataFrame:
-    cat_values = data[columns]
-    cat_values = pd.get_dummies(cat_values)
-    data = data.drop(columns, axis=1)
-    data = pd.concat([data, cat_values], axis=1)
-    return data
+def get_ohe_encoding(
+    data: pd.DataFrame, ohe_columns: list[str]
+) -> tuple[pd.DataFrame, OneHotEncoder]:
+    ohe_values = data[ohe_columns]
+    ohe_encoder = OneHotEncoder()
+    ohe_encoder.fit(ohe_values)
+    data_encoded = pd.DataFrame(
+        ohe_encoder.transform(ohe_values).toarray(),
+        columns=ohe_encoder.get_feature_names_out(ohe_columns),
+        index=data.index,
+    )
+    data = pd.concat([data.drop(ohe_columns, axis=1), data_encoded], axis=1)
+    return data, ohe_encoder
 
 
-def normalize(data: pd.DataFrame, columns: list[str]) -> pd.DataFrame:
-    data[columns] = (data[columns] - data[columns].mean()) / data[columns].std()
-    return data
+def get_ordinal_encoding(
+    data: pd.DataFrame, ordinal_columns: list[str]
+) -> tuple[pd.DataFrame, OrdinalEncoder]:
+    ordinal_values = data[ordinal_columns]
+    ordinal_encoder = OrdinalEncoder()
+    ordinal_encoder.fit(ordinal_values)
+    data_encoded = pd.DataFrame(
+        ordinal_encoder.transform(ordinal_values),
+        index=data.index,
+    )
+    data = pd.concat([data.drop(ordinal_columns, axis=1), data_encoded], axis=1)
+    return data, ordinal_encoder
+
+
+def normalize(
+    data: pd.DataFrame, columns: list[str]
+) -> tuple[pd.DataFrame, StandardScaler]:
+    scaler = StandardScaler()
+    scaler.fit(data[columns])
+    data_scaled = pd.DataFrame(
+        scaler.transform(data[columns]),
+        columns=columns,
+        index=data.index,
+    )
+    data = pd.concat([data.drop(columns, axis=1), data_scaled], axis=1)
+    return data, scaler
 
 
 def equalize_classes(data: pd.DataFrame, target: str) -> pd.DataFrame:
