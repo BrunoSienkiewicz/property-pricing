@@ -20,8 +20,8 @@
       "area",
       "year_built",
       "rooms"
-    ],
-  }
+    ]
+  },
   "query_path": "get_property_info.sql",
   "query_params": {
     "start_date": "2021-01-30",
