@@ -20,12 +20,19 @@ services:
     ports:
       - "6379:6379"
 
-  # model:
-  #   context: ./model
-  #   env_file:
-  #     - ./model/.env
-  #   ports:
-  #     - "8080:8080"
+  model:
+    image: ${MODEL_IMAGE:-property_pricing-base_model:1.0}
+    ports:
+      - "8081:8081"
+
+  app:
+    image: ${APP_IMAGE:-property_pricing-app:latest}
+    environment:
+      CONNECTION_STRING: ${CONNECTION_STRING:-postgresql://postgres:postgres@postgres:5432/property_db}
+      REDIS_HOST: ${REDIS_HOST:-redis}
+      REDIS_PORT: ${REDIS_PORT:-6379}
+    ports:
+      - "8080:8080"
 
 volumes:
   postgres_data:

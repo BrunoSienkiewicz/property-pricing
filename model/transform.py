@@ -6,11 +6,12 @@ from sklearn.preprocessing import OneHotEncoder, OrdinalEncoder, StandardScaler
 
 
 def get_ohe_encoding(
-    data: pd.DataFrame, ohe_columns: list[str]
+    data: pd.DataFrame, ohe_columns: list[str], ohe_encoder: OneHotEncoder = None
 ) -> tuple[pd.DataFrame, OneHotEncoder]:
     ohe_values = data[ohe_columns]
-    ohe_encoder = OneHotEncoder()
-    ohe_encoder.fit(ohe_values)
+    if ohe_encoder is None:
+        ohe_encoder = OneHotEncoder()
+        ohe_encoder.fit(ohe_values)
     data_encoded = pd.DataFrame(
         ohe_encoder.transform(ohe_values).toarray(),
         columns=ohe_encoder.get_feature_names_out(ohe_columns),
@@ -21,11 +22,14 @@ def get_ohe_encoding(
 
 
 def get_ordinal_encoding(
-    data: pd.DataFrame, ordinal_columns: list[str]
+    data: pd.DataFrame,
+    ordinal_columns: list[str],
+    ordinal_encoder: OrdinalEncoder = None,
 ) -> tuple[pd.DataFrame, OrdinalEncoder]:
     ordinal_values = data[ordinal_columns]
-    ordinal_encoder = OrdinalEncoder()
-    ordinal_encoder.fit(ordinal_values)
+    if ordinal_encoder is None:
+        ordinal_encoder = OrdinalEncoder()
+        ordinal_encoder.fit(ordinal_values)
     data_encoded = pd.DataFrame(
         ordinal_encoder.transform(ordinal_values),
         index=data.index,
@@ -35,10 +39,11 @@ def get_ordinal_encoding(
 
 
 def normalize(
-    data: pd.DataFrame, columns: list[str]
+    data: pd.DataFrame, columns: list[str], scaler: StandardScaler = None
 ) -> tuple[pd.DataFrame, StandardScaler]:
-    scaler = StandardScaler()
-    scaler.fit(data[columns])
+    if scaler is None:
+        scaler = StandardScaler()
+        scaler.fit(data[columns])
     data_scaled = pd.DataFrame(
         scaler.transform(data[columns]),
         columns=columns,
