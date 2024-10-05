@@ -100,8 +100,21 @@ def load_model_from_directory(
     device: torch.device = torch.device("cpu"),
 ):
     model_state_dict = torch.load(model_directory / "model.pth", map_location=device)
-    ohe_encoder = joblib.load(model_directory / "ohe_encoder.pkl")
-    ordinal_encoder = joblib.load(model_directory / "ordinal_encoder.pkl")
-    scaler = joblib.load(model_directory / "scaler.pkl")
+
+    ohe_encoder = (
+        joblib.load(model_directory / "ohe_encoder.pkl")
+        if (model_directory / "ohe_encoder.pkl").exists()
+        else None
+    )
+    ordinal_encoder = (
+        joblib.load(model_directory / "ordinal_encoder.pkl")
+        if (model_directory / "ordinal_encoder.pkl").exists()
+        else None
+    )
+    scaler = (
+        joblib.load(model_directory / "scaler.pkl")
+        if (model_directory / "scaler.pkl").exists()
+        else None
+    )
 
     return model_state_dict, ohe_encoder, ordinal_encoder, scaler

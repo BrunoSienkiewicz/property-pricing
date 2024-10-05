@@ -5,6 +5,7 @@ import pandas as pd
 import torch
 from feast import FeatureStore
 
+from model import CustomNet
 from transform import get_ohe_encoding, get_ordinal_encoding, normalize
 from utils import load_config, load_model_from_directory
 
@@ -15,11 +16,17 @@ class InferenceHandler:
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.fs = FeatureStore(repo_path=os.getenv("FEAST_REPO_DIR"))
         self.config = load_config(os.getenv("CONFIG_PATH"))
-        model, ohe_encoder, ordinal_encoder, scaler = load_model_from_directory(
-            Path(os.getenv("ARTIFACTS_DIR")),
-            device=self.device,
+        model_state_dict, ohe_encoder, ordinal_encoder, scaler = (
+            load_model_from_directory(
+                Path(os.getenv("ARTIFACTS_DIR")),
+                device=self.device,
+            )
         )
-        self.model = model
+        self.model = CustomNet(**self.config["model_metadata"]["model_params"]).to(
+            self.device
+        )
+        self.model.eval()
+        self.model.load_state_dict(model_state_dict)
         self.ohe_encoder = ohe_encoder
         self.ordinal_encoder = ordinal_encoder
         self.scaler = scaler
@@ -30,16 +37,20 @@ class InferenceHandler:
         #     features=self.config["model_metadata"]["features"],
         #     entity_rows=data,
         # ).to_dict()
-        df = pd.DataFrame.from_records(request)
-        df, _ = get_ohe_encoding(df, self.config["ohe_features"], self.ohe_encoder)
-        df, _ = get_ordinal_encoding(
-            df, self.config["ordinal_features"], self.ordinal_encoder
+        df = pd.DataFrame([request])
+        df, _ = get_ohe_encoding(
+            df, self.config["model_metadata"]["ohe_features"], self.ohe_encoder
         )
-        df, _ = normalize(df, self.config["numerical_features"], self.scaler)
+        df, _ = get_ordinal_encoding(
+            df, self.config["model_metadata"]["ordinal_features"], self.ordinal_encoder
+        )
+        df, _ = normalize(
+            df, self.config["model_metadata"]["numerical_features"], self.scaler
+        )
         return torch.tensor(df.values).float().to(self.device)
 
-    def postprocess(self, data: torch.Tensor) -> list[dict]:
-        return [{"prediction": int(p)} for p in data]
+    def postprocess(self, data: torch.Tensor) -> int:
+        return int(data.item())
 
     def predict(self, request: dict) -> list[dict]:
         data = self.preprocess(request)

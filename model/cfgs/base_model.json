@@ -14,13 +14,14 @@
     ],
     "target": "total_price",
     "ohe_features": ["city", "region"],
-    "categorical_features": [],
-    "numerical_features": [
-      "floor",
-      "area",
-      "year_built",
-      "rooms"
-    ]
+    "ordinal_features": [],
+    "numerical_features": ["floor", "area", "year_built", "rooms"],
+    "model_params": {
+      "input_size": 54,
+      "hidden_size": 64,
+      "hidden_layers": 3,
+      "out_size": 1
+    }
   },
   "query_path": "get_property_info.sql",
   "query_params": {

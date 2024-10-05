@@ -13,6 +13,7 @@ COPY $FEAST_REPO_DIR ./feast
 COPY $CONFIG_PATH ./config.json
 COPY ./api.py .
 COPY ./handler.py .
+COPY ./model.py .
 COPY ./utils.py .
 COPY ./transform.py .
 COPY ./poetry.lock .

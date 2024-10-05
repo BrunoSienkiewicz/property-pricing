@@ -1,16 +1,22 @@
 import argparse
 import os
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
 from handler import InferenceHandler
 
 app = FastAPI()
+inference_handler = InferenceHandler()
 
 
 class InferenceRequest(BaseModel):
-    inputs: dict
+    city: str
+    region: str
+    floor: int
+    rooms: int
+    year_built: int
+    area: int
 
 
 @app.get("/health")
@@ -20,7 +26,11 @@ def health():
 
 @app.post("/predict")
 def predict(request: InferenceRequest):
-    return InferenceHandler().predict(request.inputs)
+    try:
+        response = inference_handler.predict(request.model_dump())
+        return {"predictions": response}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=e)
 
 
 if __name__ == "__main__":
@@ -31,4 +41,4 @@ if __name__ == "__main__":
     parser.add_argument("--port", default=8080)
     args = parser.parse_args()
 
-    uvicorn.run(app, host=args.host, port=args.port)
+    uvicorn.run(app, host=args.host, port=int(args.port))
