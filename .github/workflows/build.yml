@@ -3,16 +3,21 @@ name: Build Images
 on:
   push:
     branches:
-      - master
+      - main
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
     env:
-      AWS_REGION: us-east-1
-      ECR_REPOSITORY: ${{ env.ECR_REPOSITORY }}
-      IMAGE_TAG: latest
+      AWS_REGION: ${{ vars.AWS_REGION }}
+      ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
+
+      MODEL_NAME: base_model
+      MODEL_VERSION: 1.0
+      FEAST_REPO_DIR: ./feature_repo_local
+      ARTIFACTS_DIR: ./artifacts/base_model_1.0
+      CONFIG_PATH: ./cfgs/base_model.json
 
     steps:
       - name: Checkout code
@@ -29,21 +34,10 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
 
-      - name: Get list of changed directories
-        id: changed-files
-        run: |
-          CHANGED_DIRS=$(git diff --name-only HEAD~1 HEAD | cut -d'/' -f1 | sort -u)
-          echo "Changed directories: $CHANGED_DIRS"
-          echo "::set-output name=dirs::$CHANGED_DIRS"
-
       - name: Build and push Docker images
         run: |
-          for dir in ${{ steps.changed-files.outputs.dirs }}; do
-            if [ -f "$dir/Dockerfile" ]; then
-              echo "Building Docker image for $dir"
-              docker build -t ${{ env.ECR_REPOSITORY }}-$dir:latest $dir/
-
-              echo "Pushing Docker image for $dir"
-              docker push ${{ env.ECR_REPOSITORY }}-$dir:latest
-            fi
-          done
+          docker compose -f docker-compose.yml build
+          docker tag property_pricing/$MODEL_NAME:$MODEL_VERSION $ECR_REPOSITORY/$MODEL_NAME:$MODEL_VERSION
+          docker tag property_pricing/app:latest $ECR_REPOSITORY/app:latest
+          docker push $ECR_REPOSITORY/$MODEL_NAME:$MODEL_VERSION
+          docker push $ECR_REPOSITORY/app:latest

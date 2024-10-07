@@ -21,7 +21,7 @@ services:
       - "6379:6379"
 
   model:
-    image: ${MODEL_IMAGE:-property_pricing-base_model:1.0}
+    image: ${MODEL_IMAGE:-property_pricing/base_model:1.0}
     build:
       context: ./model
       dockerfile: Dockerfile
@@ -35,7 +35,7 @@ services:
       - "8081:8081"
 
   app:
-    image: ${APP_IMAGE:-property_pricing-app:latest}
+    image: ${APP_IMAGE:-property_pricing/app:latest}
     build:
       context: ./app
       dockerfile: Dockerfile
@@ -44,7 +44,7 @@ services:
       REDIS_HOST: ${REDIS_HOST:-redis}
       REDIS_PORT: ${REDIS_PORT:-6379}
     ports:
-      - "25565:8080"
+      - "8080:8080"
 
 volumes:
   postgres_data:
