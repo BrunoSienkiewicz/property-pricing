@@ -28,7 +28,7 @@ def health():
 def predict(request: InferenceRequest):
     try:
         response = inference_handler.predict(request.model_dump())
-        return {"predictions": response}
+        return {"prediction": response}
     except Exception as e:
         raise HTTPException(status_code=500, detail=e)
 
