@@ -1,5 +1,5 @@
 resource "aws_s3_bucket" "feast_bucket" {
-  bucket        = "${var.project_name}-bucket"
+  bucket        = "featuresbucket"
   force_destroy = true
 }
 
@@ -56,3 +56,4 @@ resource "aws_iam_role_policy_attachment" "s3-policy-attachment" {
   role       = aws_iam_role.s3_spectrum_role.name
   policy_arn = aws_iam_policy.s3_full_access_policy.arn
 }
+
