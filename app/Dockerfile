@@ -8,9 +8,14 @@ ENV POETRY_NO_INTERACTION=1 \
 COPY . /app
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y --no-install-recommends gcc libpq-dev python3-dev
-RUN pip install poetry
-RUN poetry install --no-dev --no-interaction --no-ansi && rm -rf $POETRY_CACHE_DIR
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends gcc libpq-dev python3-dev && \
+    pip install poetry && \
+    poetry install --no-dev --no-interaction --no-ansi && \
+    apt-get remove -y gcc libpq-dev python3-dev && \
+    apt-get autoremove -y && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /tmp/* $POETRY_CACHE_DIR
 
 EXPOSE 8080
 
