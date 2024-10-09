@@ -46,7 +46,7 @@ def save_model(
             "model_name": [config["model_name"]],
             "model_version": [config["model_version"]],
             "model_description": [config["model_description"]],
-            "model_metadata": [json.dumps(config["model_metadata"])],
+            "model_metadata": [json.dumps(config)],
             "model_binary": [binary],
         }
     )
@@ -54,15 +54,21 @@ def save_model(
     if ohe_encoder:
         ohe_encoder_path = model_path / "ohe_encoder.pkl"
         joblib.dump(ohe_encoder, ohe_encoder_path)
-        df["model_ohe_encoder"] = [joblib.load(ohe_encoder_path)]
+        with open(ohe_encoder_path, "rb") as file:
+            ohe_binary = file.read()
+        df["model_ohe_encoder"] = [ohe_binary]
     if ordinal_encoder:
         ordinal_encoder_path = model_path / "ordinal_encoder.pkl"
         joblib.dump(ordinal_encoder, ordinal_encoder_path)
-        df["model_ordinal_encoder"] = [joblib.load(ordinal_encoder_path)]
+        with open(ordinal_encoder_path, "rb") as file:
+            ordinal_binary = file.read()
+        df["model_ordinal_encoder"] = [ordinal_binary]
     if scaler:
         scaler_path = model_path / "scaler.pkl"
         joblib.dump(scaler, scaler_path)
-        df["model_scaler"] = [joblib.load(scaler_path)]
+        with open(scaler_path, "rb") as file:
+            scaler_binary = file.read()
+        df["model_scaler"] = [scaler_binary]
 
     if connection_string:
         df.to_sql(
@@ -87,12 +93,12 @@ def load_model_from_db(
 
     model_state_dict = df["model_binary"].values[0]
     model = torch.load(model_state_dict, map_location=device)
-    metadata = json.loads(df["model_metadata"].values[0])
+    config = json.loads(df["model_metadata"].values[0])
     ohe_encoder = joblib.load(df["model_ohe_encoder"].values[0])
     ordinal_encoder = joblib.load(df["model_ordinal_encoder"].values[0])
     scaler = joblib.load(df["model_scaler"].values[0])
 
-    return model, metadata, ohe_encoder, ordinal_encoder, scaler
+    return model, config, ohe_encoder, ordinal_encoder, scaler
 
 
 def load_model_from_directory(

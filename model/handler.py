@@ -7,7 +7,7 @@ from feast import FeatureStore
 
 from model import CustomNet
 from transform import get_ohe_encoding, get_ordinal_encoding, normalize
-from utils import load_config, load_model_from_directory
+from utils import load_model_from_db
 
 
 class InferenceHandler:
@@ -15,13 +15,15 @@ class InferenceHandler:
         super(InferenceHandler, self).__init__()
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.fs = FeatureStore(repo_path=os.getenv("FEAST_REPO_DIR"))
-        self.config = load_config(os.getenv("CONFIG_PATH"))
-        model_state_dict, ohe_encoder, ordinal_encoder, scaler = (
-            load_model_from_directory(
-                Path(os.getenv("ARTIFACTS_DIR")),
+        model_state_dict, config, ohe_encoder, ordinal_encoder, scaler = (
+            load_model_from_db(
+                model_name=os.getenv("MODEL_NAME"),
+                model_version=os.getenv("MODEL_VERSION"),
+                connection_string=os.getenv("DB_CONNECTION_STRING"),
                 device=self.device,
             )
         )
+        self.config = config
         self.model = CustomNet(**self.config["model_metadata"]["model_params"]).to(
             self.device
         )
