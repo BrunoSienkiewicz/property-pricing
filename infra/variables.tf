@@ -8,12 +8,12 @@ variable "redshift_db_name" {
   default = "property_pricing"
 }
 
-variable "redshift_username" {
+variable "db_username" {
   type      = string
   sensitive = true
 }
 
-variable "redshift_password" {
+variable "db_password" {
   type      = string
   sensitive = true
 }
