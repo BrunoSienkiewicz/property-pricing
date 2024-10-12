@@ -1,0 +1,20 @@
+project: local_project
+registry: data/registry.db
+provider: local
+
+online_store:
+  type: redis
+  connection_string: redis://localhost:6379
+
+offline_store:
+  type: postgres
+  host: localhost
+  port: 5432
+  database: property_db
+  db_schema: feature_store
+  user: postgres
+  password: postgres
+
+feature_server:
+  type: local
+entity_key_serialization_version: 2
