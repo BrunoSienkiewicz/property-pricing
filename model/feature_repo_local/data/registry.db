@@ -1,51 +1,0 @@
-
-W
-8
-property_idProperty ID"property_idJlocal_project
-½ÓÑ¶èëÅMşÌÓ¶ø±¦
-C
-$
-__dummy"
-__dummy_idJlocal_project
-½ÓÑ¶ğ‰ÉMşÌÓ¶˜š¸¦1"$5e807a02-0d75-4706-8c88-76750fcd7a89*şÌÓ¶˜»ª§2ã
-Ã
-property_infolocal_projectproperty_id"
-total_price"
-area"
-market_type"
-city"
-
-region"
-	longitude"
-latitude"	
-floor"
-
-year_built"	
-rooms"
-
-date_added2€š:æingestion_timestamp‚_
-]{"name": "property_info", "query": "SELECT * FROM property_store.property_info", "table": ""}ŠZfeast.infra.offline_stores.contrib.postgres_offline_store.postgres_source.PostgreSQLSource¢property_info@b
-property_id
-½ÓÑ¶°²MşÌÓ¶ˆÕ·¥:ÿ
-ß
-property_info_v1local_project¤
-property_info
-total_price
-area
-market_type
-city
-
-region
-	longitude
-latitude	
-floor
-
-year_built	
-rooms
-
-date_added"
-release
-production
-½ÓÑ¶ğñĞMşÌÓ¶€™»¦böingestion_timestamp‚_
-]{"name": "property_info", "query": "SELECT * FROM property_store.property_info", "table": ""}ŠZfeast.infra.offline_stores.contrib.postgres_offline_store.postgres_source.PostgreSQLSource¢property_infoªlocal_projectz5
-local_project$3123fe5e-040b-494e-b8df-234ff17c4e80
