@@ -4,4 +4,7 @@ create = true
 [tool.poetry.group.scripts.dependencies]
 optional = true
 
+[tool.poetry.group.dev.dependencies]
+optional = false
+
 

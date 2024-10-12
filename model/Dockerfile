@@ -11,8 +11,8 @@ ENV POETRY_NO_INTERACTION=1 \
 
 COPY $FEAST_REPO_DIR ./feast
 
-COPY ./api.py ./handler.py ./model.py ./utils.py ./transform.py ./
-COPY poetry.lock pyproject.toml poetry.toml ./
+COPY ./api.py ./inference_handler.py ./model.py ./utils.py ./transform.py ./
+COPY poetry.lock pyproject.toml poetry.toml ./README.md ./
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends gcc libpq-dev python3-dev && \
@@ -40,7 +40,7 @@ ARG MODEL_VERSION
 
 ENV MODEL_NAME=$MODEL_NAME \
     MODEL_VERSION=$MODEL_VERSION \
-    FEAST_REPO_DIR=./feast \
+    FEAST_REPO_DIR=./feast
 
 EXPOSE 8081
 

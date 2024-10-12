@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "app"
+name = "streamlit_app"
 version = "0.1.0"
 description = ""
 authors = ["Bruno Sienkiewicz <bruno.sienkiewicz@gmail.com>"]
@@ -12,6 +12,8 @@ redis = "^5.0.8"
 sqlalchemy = "^2.0.35"
 psycopg2 = "^2.9.9"
 
+[project.scripts]
+app = "__main__:main"
 
 [build-system]
 requires = ["poetry-core"]

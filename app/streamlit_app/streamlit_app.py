@@ -7,7 +7,7 @@ import streamlit as st
 from utils import get_data, load_query, redis_cache
 
 MODEL_NAME = os.getenv("MODEL_NAME")
-PREDICT_URL = f"http://model:8081/predict"
+PREDICT_URL = os.getenv("PREDICT_URL")
 CITIES_QUERY = load_query("queries/get_cities.sql")
 
 st.set_page_config(layout="wide")

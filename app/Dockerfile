@@ -10,14 +10,17 @@ WORKDIR /app
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends gcc libpq-dev python3-dev && \
-    pip install poetry && \
-    poetry install --no-dev --no-interaction --no-ansi && \
-    apt-get remove -y gcc libpq-dev python3-dev && \
+    pip install poetry
+
+RUN poetry build && \
+    pip install dist/*.whl
+    
+RUN apt-get remove -y gcc libpq-dev python3-dev && \
     apt-get autoremove -y && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* $POETRY_CACHE_DIR
 
 EXPOSE 8080
 
-CMD ["poetry", "run", "streamlit", "run", "streamlit_app.py", "--server.port", "8080"]
+CMD ["app", "--server.port", "8080"]
 

@@ -4,6 +4,7 @@ __pycache__/
 artifacts/
 *.pth
 *.csv
+dist/
 
 # Terraform
 .terraform/
