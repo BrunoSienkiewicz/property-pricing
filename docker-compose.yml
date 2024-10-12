@@ -43,6 +43,7 @@ services:
       CONNECTION_STRING: ${CONNECTION_STRING:-postgresql://postgres:postgres@postgres:5432/property_db}
       REDIS_HOST: ${REDIS_HOST:-redis}
       REDIS_PORT: ${REDIS_PORT:-6379}
+      PREDICT_URL: ${PREDICT_URL:-http://model:8081/predict}
     ports:
       - "8080:8080"
 
