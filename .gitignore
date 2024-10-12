@@ -20,3 +20,6 @@ bin/
 
 # Docker
 postgres_data/
+
+# Data
+/data/

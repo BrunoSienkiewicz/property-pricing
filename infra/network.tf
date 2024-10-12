@@ -7,14 +7,13 @@ resource "aws_vpc" "main" {
 resource "aws_subnet" "private_subnet" {
   count             = 2
   vpc_id            = aws_vpc.main.id
-  cidr_block        = cidrsubnet(aws_vpc.main.cidr_block, 4, count.index)
-  availability_zone = "us-west-2a"
+  cidr_block        = cidrsubnet(aws_vpc.main.cidr_block, 4, count.index + 2)
+  availability_zone = element(["us-west-2a", "us-west-2b"], count.index)
 }
 
 resource "aws_subnet" "public_subnet" {
-  count                   = 2
   vpc_id                  = aws_vpc.main.id
-  cidr_block              = cidrsubnet(aws_vpc.main.cidr_block, 4, count.index)
+  cidr_block              = "10.0.3.0/24"
   availability_zone       = "us-west-2a"
   map_public_ip_on_launch = true
 }
@@ -33,6 +32,7 @@ resource "aws_route_table" "public_rt" {
 }
 
 resource "aws_route_table_association" "public_rt_assoc" {
+  count          = 2
   subnet_id      = aws_subnet.public_subnet.id
   route_table_id = aws_route_table.public_rt.id
 }
@@ -44,7 +44,7 @@ resource "aws_security_group" "ec2_sg" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"] # Allows SSH from anywhere, restrict as needed
+    cidr_blocks = ["0.0.0.0/0"] # Allows SSH from anywhere
   }
 
   ingress {

@@ -1,9 +1,9 @@
 variable "project_name" {
   type    = string
-  default = "property_pricing"
+  default = "property-pricing"
 }
 
-variable "redshift_db_name" {
+variable "db_name" {
   type    = string
   default = "property_pricing"
 }

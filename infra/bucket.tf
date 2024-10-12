@@ -3,6 +3,12 @@ resource "aws_s3_bucket" "feast_bucket" {
   force_destroy = true
 }
 
+resource "aws_s3_object" "sample_data_bucket_object" {
+  bucket = aws_s3_bucket.feast_bucket.bucket
+  key    = "zipcode_features/table.parquet"
+  source = "${path.module}../data/Houses.csv"
+}
+
 resource "aws_iam_role" "s3_spectrum_role" {
   name = "s3_spectrum_role"
 
