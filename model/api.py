@@ -1,10 +1,9 @@
 import argparse
-import os
 
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
-from handler import InferenceHandler
+from inference_handler import InferenceHandler
 
 app = FastAPI()
 inference_handler = InferenceHandler()
@@ -33,7 +32,7 @@ def predict(request: InferenceRequest):
         raise HTTPException(status_code=500, detail=e)
 
 
-if __name__ == "__main__":
+def main():
     import uvicorn
 
     parser = argparse.ArgumentParser()
@@ -42,3 +41,6 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     uvicorn.run(app, host=args.host, port=int(args.port))
+
+if __name__ == "__main__":
+    main()

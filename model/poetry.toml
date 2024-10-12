@@ -1,2 +1,7 @@
 [virtualenvs]
 create = true
+
+[tool.poetry.group.scripts.dependencies]
+optional = true
+
+

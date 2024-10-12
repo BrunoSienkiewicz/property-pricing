@@ -1,13 +1,12 @@
 import io
 import json
 import os
+import pickle
 from pathlib import Path
 
 import joblib
+import boto3
 import pandas as pd
-import psycopg2
-import torch
-import torch.nn as nn
 from sklearn.preprocessing import OneHotEncoder, OrdinalEncoder, StandardScaler
 
 
@@ -43,7 +42,7 @@ def deserialize_object(binary):
 
 
 def save_model_to_dir(
-    model: nn.Module,
+    model,
     config: dict,
     ohe_encoder: OneHotEncoder = OneHotEncoder(),
     ordinal_encoder: OrdinalEncoder = OrdinalEncoder(),
@@ -70,7 +69,7 @@ def save_model_to_dir(
 
 
 def save_model_to_db(
-    model: nn.Module,
+    model,
     config: dict,
     connection_string: str,
     ohe_encoder: OneHotEncoder = OneHotEncoder(),
@@ -101,11 +100,39 @@ def save_model_to_db(
     df.to_sql("model_store.models", connection_string, if_exists="append", index=False)
 
 
+def save_model_to_s3(
+        model,
+        config: dict,
+        bucket: str,
+        ohe_encoder: OneHotEncoder = OneHotEncoder(),
+        ordinal_encoder: OrdinalEncoder = OrdinalEncoder(),
+        scaler: StandardScaler = StandardScaler(),
+        ):
+    s3 = boto3.client("s3")
+    model_state_dict = pickle.dumps(model.state_dict())
+    model_key = f"{config['model_name']}_{config['model_version']}/model.pth"
+    s3.put_object(Bucket=bucket, Key=model_key, Body=model_state_dict)
+
+    if ohe_encoder:
+        ohe_encoder_binary = pickle.dumps(ohe_encoder)
+        ohe_encoder_key = f"{config['model_name']}_{config['model_version']}/ohe_encoder.pkl"
+        s3.put_object(Bucket=bucket, Key=ohe_encoder_key, Body=ohe_encoder_binary)
+
+    if ordinal_encoder:
+        ordinal_encoder_binary = pickle.dumps(ordinal_encoder)
+        ordinal_encoder_key = f"{config['model_name']}_{config['model_version']}/ordinal_encoder.pkl"
+        s3.put_object(Bucket=bucket, Key=ordinal_encoder_key, Body=ordinal_encoder_binary)
+
+    if scaler:
+        scaler_binary = pickle.dumps(scaler)
+        scaler_key = f"{config['model_name']}_{config['model_version']}/scaler.pkl"
+        s3.put_object(Bucket=bucket, Key=scaler_key, Body=scaler_binary)
+
+
 def load_model_from_db(
     model_name: str,
     model_version: str,
     connection_string: str,
-    device: torch.device = torch.device("cpu"),
 ):
     df = pd.read_sql(
         f"SELECT * FROM model_store.models WHERE model_name='{model_name}' AND model_version='{model_version}'",
@@ -113,20 +140,18 @@ def load_model_from_db(
     )
 
     model_state_dict = deserialize_object(df["model_binary"].values[0])
-    model = torch.load(model_state_dict, map_location=device)
     config = json.loads(df["model_metadata"].values[0])
     ohe_encoder = deserialize_object(df["model_ohe_encoder"].values[0])
     ordinal_encoder = deserialize_object(df["model_ordinal_encoder"].values[0])
     scaler = deserialize_object(df["model_scaler"].values[0])
 
-    return model, config, ohe_encoder, ordinal_encoder, scaler
+    return model_state_dict, config, ohe_encoder, ordinal_encoder, scaler
 
 
 def load_model_from_dir(
     model_directory: os.PathLike,
-    device: torch.device = torch.device("cpu"),
 ):
-    model_state_dict = torch.load(model_directory / "model.pth", map_location=device)
+    model_state_dict = joblib.load(model_directory / "model.pth")
 
     ohe_encoder = (
         joblib.load(model_directory / "ohe_encoder.pkl")
@@ -145,3 +170,29 @@ def load_model_from_dir(
     )
 
     return model_state_dict, ohe_encoder, ordinal_encoder, scaler
+
+
+def load_model_from_s3(
+        model_name: str,
+        model_version: str,
+        bucket: str,
+        ):
+    s3 = boto3.client("s3")
+    model_key = f"{model_name}_{model_version}/model.pth"
+    model_binary = s3.get_object(Bucket=bucket, Key=model_key)["Body"].read()
+    model_state_dict = pickle.loads(model_binary)
+
+    ohe_encoder_key = f"{model_name}_{model_version}/ohe_encoder.pkl"
+    ohe_encoder_binary = s3.get_object(Bucket=bucket, Key=ohe_encoder_key)["Body"].read()
+    ohe_encoder = pickle.loads(ohe_encoder_binary)
+
+    ordinal_encoder_key = f"{model_name}_{model_version}/ordinal_encoder.pkl"
+    ordinal_encoder_binary = s3.get_object(Bucket=bucket, Key=ordinal_encoder_key)["Body"].read()
+    ordinal_encoder = pickle.loads(ordinal_encoder_binary)
+
+    scaler_key = f"{model_name}_{model_version}/scaler.pkl"
+    scaler_binary = s3.get_object(Bucket=bucket, Key=scaler_key)["Body"].read()
+    scaler = pickle.loads(scaler_binary)
+
+    return model_state_dict, ohe_encoder, ordinal_encoder, scaler
+

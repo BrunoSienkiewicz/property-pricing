@@ -7,8 +7,6 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.10"
-torch = "^2.4.0"
-feast = {extras = ["redis"], version = "^0.40.1"}
 scikit-learn = "^1.5.1"
 ipykernel = "^6.29.5"
 psycopg = {extras = ["binary"], version = "^3.2.1"}
@@ -17,9 +15,18 @@ psycopg2 = "^2.9.9"
 matplotlib = "^3.9.2"
 seaborn = "^0.13.2"
 imblearn = "^0.0"
+
+[tool.poetry.group.scripts.dependencies]
+boto3 = "^1.35.39"
+
+[tool.poetry.group.dev.dependencies]
 fastapi = "^0.115.0"
 uvicorn = "^0.30.6"
+torch = "^2.4.0"
+feast = {extras = ["redis"], version = "^0.40.1"}
 
+[project.scripts]
+api = "api:main"
 
 [build-system]
 requires = ["poetry-core"]
